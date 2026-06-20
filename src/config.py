@@ -1,17 +1,32 @@
-import os
-from dotenv import load_dotenv
+from typing import Literal
 
-load_dotenv()
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
-OPENROUTER_API_KEY = os.environ["OPENROUTER_API_KEY"]
-FINANCEBENCH_DIR = os.environ["FINANCEBENCH_DIR"]
-EMBEDDING_MODEL = os.environ["EMBEDDING_MODEL"]
-EMBEDDING_DIM = int(os.environ["EMBEDDING_DIM"])
-QDRANT_URL = os.environ["QDRANT_URL"]
-QDRANT_COLLECTION = os.environ["QDRANT_COLLECTION"]
-LLM_MODEL = os.environ["LLM_MODEL"]
-JUDGE_MODEL = os.environ["JUDGE_MODEL"]
-RETRIEVAL_MODE = os.environ["RETRIEVAL_MODE"]
-SPARSE_MODEL = os.environ["SPARSE_MODEL"]
-RERANK = os.environ["RERANK"].lower() == "true"
-RERANK_MODEL = os.environ["RERANK_MODEL"]
+
+class Settings(BaseSettings):
+    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+
+    # Required
+    openrouter_api_key: str
+    financebench_dir: str
+
+    # Embeddings
+    embedding_model: str = "openai/text-embedding-3-small"
+    embedding_dim: int = 1536
+    sparse_model: str = "Qdrant/bm25"
+
+    # Vector store
+    qdrant_url: str = "http://localhost:6333"
+    qdrant_collection: str = "financerag"
+
+    # Generation & evaluation
+    llm_model: str = "openai/gpt-4o-mini"
+    judge_model: str = "openai/gpt-4o"
+
+    # Retrieval
+    retrieval_mode: Literal["dense", "hybrid"] = "hybrid"
+    rerank: bool = False
+    rerank_model: str = "jinaai/jina-reranker-v2-base-multilingual"
+
+
+settings = Settings()  # type: ignore[call-arg]  # values come from the environment

@@ -1,9 +1,9 @@
 import json
 from openai import OpenAI
-from .config import OPENROUTER_API_KEY, JUDGE_MODEL
+from .config import settings
 from . import usage
 
-client = OpenAI(base_url="https://openrouter.ai/api/v1", api_key=OPENROUTER_API_KEY)
+client = OpenAI(base_url="https://openrouter.ai/api/v1", api_key=settings.openrouter_api_key)
 
 CORRECTNESS_SYSTEM = (
     "You are grading a financial QA system. Compare the GENERATED answer to the "
@@ -39,7 +39,7 @@ def _parse(text, fallback_verdict):
 def correctness(question, gold, generated):
     """Judge whether the generated answer is correct relative to the gold answer."""
     response = client.chat.completions.create(
-        model=JUDGE_MODEL,
+        model=settings.judge_model,
         messages=[
             {"role": "system", "content": CORRECTNESS_SYSTEM},
             {
@@ -49,19 +49,19 @@ def correctness(question, gold, generated):
         ],
         temperature=0.0,
     )
-    usage.record(JUDGE_MODEL, response.usage)
+    usage.record(settings.judge_model, response.usage)
     return _parse(response.choices[0].message.content, "incorrect")
 
 
 def faithfulness(context, answer):
     """Judge whether the answer is grounded in the provided context."""
     response = client.chat.completions.create(
-        model=JUDGE_MODEL,
+        model=settings.judge_model,
         messages=[
             {"role": "system", "content": FAITHFULNESS_SYSTEM},
             {"role": "user", "content": f"CONTEXT:\n{context}\n\nANSWER:\n{answer}"},
         ],
         temperature=0.0,
     )
-    usage.record(JUDGE_MODEL, response.usage)
+    usage.record(settings.judge_model, response.usage)
     return _parse(response.choices[0].message.content, "unsupported")

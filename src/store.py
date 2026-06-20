@@ -6,9 +6,9 @@ from qdrant_client.models import (
     SparseVector,
     PointStruct,
 )
-from .config import QDRANT_URL, QDRANT_COLLECTION, EMBEDDING_DIM
+from .config import settings
 
-client = QdrantClient(url=QDRANT_URL)
+client = QdrantClient(url=settings.qdrant_url)
 
 # Named vector identifiers used across ingest and retrieval
 DENSE = "dense"
@@ -17,12 +17,12 @@ SPARSE = "sparse"
 
 def init_collection():
     """Initialize the Qdrant collection with named dense and sparse vectors. Recreates if it exists."""
-    if client.collection_exists(QDRANT_COLLECTION):
-        client.delete_collection(QDRANT_COLLECTION)
+    if client.collection_exists(settings.qdrant_collection):
+        client.delete_collection(settings.qdrant_collection)
     client.create_collection(
-        collection_name=QDRANT_COLLECTION,
+        collection_name=settings.qdrant_collection,
         vectors_config={
-            DENSE: VectorParams(size=EMBEDDING_DIM, distance=Distance.COSINE),
+            DENSE: VectorParams(size=settings.embedding_dim, distance=Distance.COSINE),
         },
         sparse_vectors_config={
             SPARSE: SparseVectorParams(),
@@ -53,4 +53,4 @@ def upsert_chunks(chunks, dense_vectors, sparse_vectors, start_id):
             zip(chunks, dense_vectors, sparse_vectors)
         )
     ]
-    client.upsert(collection_name=QDRANT_COLLECTION, points=points)
+    client.upsert(collection_name=settings.qdrant_collection, points=points)

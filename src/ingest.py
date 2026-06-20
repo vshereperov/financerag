@@ -1,6 +1,6 @@
 from pathlib import Path
 import fitz
-from .config import FINANCEBENCH_DIR, QDRANT_COLLECTION
+from .config import settings
 from .embed import embed_texts, embed_sparse_docs
 from .store import init_collection, upsert_chunks, client
 
@@ -35,7 +35,7 @@ def chunk_text(text, size=CHUNK_SIZE, overlap=CHUNK_OVERLAP):
 
 def parse_doc(company, doc_name):
     """Parses a single PDF document and returns a list of chunks with metadata."""
-    pdf_path = Path(FINANCEBENCH_DIR) / "pdfs" / f"{doc_name}.pdf"
+    pdf_path = Path(settings.financebench_dir) / "pdfs" / f"{doc_name}.pdf"
     doc = fitz.open(pdf_path)
     chunks = []
     for page_num in range(1, doc.page_count + 1):
@@ -75,7 +75,7 @@ def ingest():
         sparse_vectors = embed_sparse_docs(texts)
         upsert_chunks(batch, dense_vectors, sparse_vectors, start_id=start)
         print(f"ingested {start + len(batch)} / {len(chunks)}")
-    print("done:", client.count(QDRANT_COLLECTION))
+    print("done:", client.count(settings.qdrant_collection))
 
 
 if __name__ == "__main__":

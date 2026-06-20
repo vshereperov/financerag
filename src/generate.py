@@ -1,8 +1,8 @@
 from openai import OpenAI
-from .config import OPENROUTER_API_KEY, LLM_MODEL
+from .config import settings
 from . import usage
 
-client = OpenAI(base_url="https://openrouter.ai/api/v1", api_key=OPENROUTER_API_KEY)
+client = OpenAI(base_url="https://openrouter.ai/api/v1", api_key=settings.openrouter_api_key)
 
 SYSTEM_PROMPT = (
     "You are a financial analyst assistant. Answer the question using ONLY the "
@@ -27,12 +27,12 @@ def generate_answer(question, points):
     """Generate an answer to the question using the retrieved points as context."""
     context = build_context(points)
     response = client.chat.completions.create(
-        model=LLM_MODEL,
+        model=settings.llm_model,
         messages=[
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": f"Context:\n{context}\n\nQuestion: {question}"},
         ],
         temperature=0.0,
     )
-    usage.record(LLM_MODEL, response.usage)
+    usage.record(settings.llm_model, response.usage)
     return response.choices[0].message.content

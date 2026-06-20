@@ -2,7 +2,7 @@ from qdrant_client.models import Prefetch, SparseVector, FusionQuery, Fusion
 from .embed import embed_texts, embed_sparse_query
 from .store import client, DENSE, SPARSE
 from .rerank import rerank
-from .config import QDRANT_COLLECTION, RETRIEVAL_MODE, RERANK
+from .config import settings
 
 # Number of candidates to retrieve from each index for hybrid retrieval
 CANDIDATES = 30
@@ -15,7 +15,7 @@ def _retrieve_dense(query, k):
     """Dense retrieval: retrieve the top k candidates from the dense vector index."""
     dense_vec = embed_texts([query])[0]
     response = client.query_points(
-        collection_name=QDRANT_COLLECTION,
+        collection_name=settings.qdrant_collection,
         query=dense_vec,
         using=DENSE,
         limit=k,
@@ -29,7 +29,7 @@ def _retrieve_hybrid(query, k):
     dense_vec = embed_texts([query])[0]
     sparse_vec = embed_sparse_query(query)
     response = client.query_points(
-        collection_name=QDRANT_COLLECTION,
+        collection_name=settings.qdrant_collection,
         prefetch=[
             Prefetch(query=dense_vec, using=DENSE, limit=CANDIDATES),
             Prefetch(
@@ -54,11 +54,11 @@ def retrieve(query, k=5):
     When RERANK is enabled, retrieve a wider candidate pool and re-score it
     down to k with a cross-encoder.
     """
-    fetch_k = RERANK_CANDIDATES if RERANK else k
-    if RETRIEVAL_MODE == "dense":
+    fetch_k = RERANK_CANDIDATES if settings.rerank else k
+    if settings.retrieval_mode == "dense":
         points = _retrieve_dense(query, fetch_k)
     else:
         points = _retrieve_hybrid(query, fetch_k)
-    if RERANK:
+    if settings.rerank:
         points = rerank(query, points, k)
     return points

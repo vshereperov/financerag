@@ -1,5 +1,5 @@
 from fastembed.rerank.cross_encoder import TextCrossEncoder
-from .config import RERANK_MODEL
+from .config import settings
 
 # Lazy initialization
 _reranker = None
@@ -8,7 +8,7 @@ _reranker = None
 def _model():
     global _reranker
     if _reranker is None:
-        _reranker = TextCrossEncoder(model_name=RERANK_MODEL)
+        _reranker = TextCrossEncoder(model_name=settings.rerank_model)
     return _reranker
 
 

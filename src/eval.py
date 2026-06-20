@@ -3,7 +3,7 @@ import json
 import time
 from pathlib import Path
 from collections import defaultdict
-from .config import FINANCEBENCH_DIR
+from .config import settings
 from .ingest import DOCS
 from .retrieve import retrieve
 from .generate import generate_answer, build_context
@@ -16,7 +16,7 @@ CORRECTNESS_SCORE = {"correct": 1.0, "partial": 0.5, "incorrect": 0.0}
 FAITHFULNESS_SCORE = {"supported": 1.0, "partial": 0.5, "unsupported": 0.0}
 
 INGESTED_DOCS = {doc_name for _, doc_name in DOCS}
-JSONL = Path(FINANCEBENCH_DIR) / "data" / "financebench_open_source.jsonl"
+JSONL = Path(settings.financebench_dir) / "data" / "financebench_open_source.jsonl"
 
 
 def load_eval_set():

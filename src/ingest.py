@@ -1,7 +1,7 @@
 from pathlib import Path
 import fitz
 from .config import FINANCEBENCH_DIR, QDRANT_COLLECTION
-from .embed import embed_texts
+from .embed import embed_texts, embed_sparse_docs
 from .store import init_collection, upsert_chunks, client
 
 # Documents to ingest: (company, document name)
@@ -70,8 +70,10 @@ def ingest():
     init_collection()
     for start in range(0, len(chunks), BATCH):
         batch = chunks[start : start + BATCH]
-        vectors = embed_texts([c["content"] for c in batch])
-        upsert_chunks(batch, vectors, start_id=start)
+        texts = [c["content"] for c in batch]
+        dense_vectors = embed_texts(texts)
+        sparse_vectors = embed_sparse_docs(texts)
+        upsert_chunks(batch, dense_vectors, sparse_vectors, start_id=start)
         print(f"ingested {start + len(batch)} / {len(chunks)}")
     print("done:", client.count(QDRANT_COLLECTION))
 

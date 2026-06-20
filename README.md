@@ -55,16 +55,47 @@ The system is evaluated against FinanceBench with a reproducible harness
 
 ---
 
+## Results
+
+Measured on 34 FinanceBench questions over 9 SEC 10-K filings. Each retrieval
+change was A/B-tested.
+
+| Config                  | hit-rate@5 | correctness | faithfulness |
+|-------------------------|-----------:|------------:|-------------:|
+| dense (baseline)        | 29.4%      | 39.7%       | 89.7%        |
+| hybrid (dense + BM25)   | 26.5%      | 30.9%       | 98.5%        |
+| dense + reranker        | 50.0%      | 44.1%       | 95.6%        |
+| **hybrid + reranker**   | **52.9%**  | **51.5%**   | 89.7%        |
+
+Notes:
+
+- **Reranker model choice was decisive.** A 512-token cross-encoder
+  (ms-marco-MiniLM) made retrieval *worse* than baseline by truncating long
+  table chunks; a 1024-token model (jina-reranker-v2) nearly doubled hit-rate.
+  This points to chunk length as the next bottleneck.
+- **Best config is hybrid + reranker:** the reranker rescues
+  hybrid's good recall from its poor ranking.
+- Reranking trades latency for quality (~12 s/query on CPU); production would
+  move the reranker to GPU or a hosted rerank API.
+
+---
+
 ## Corpus
 
-5 companies selected by 10-K question coverage in FinanceBench, with sector diversity:
+The corpus is built from SEC 10-K filings of 5 companies, evaluated against
+the open-source FinanceBench benchmark.
 
-| Company | 10-K questions | Sector |
-|---|---|---|
-| AMD | 8 | Semiconductors |
-| Boeing | 8 | Aerospace / industrial |
-| American Express | 7 | Financial services |
-| PepsiCo | 6 | Consumer staples |
-| 3M | 5 | Industrial conglomerate |
+Companies were not chosen at random. From the 150-question open FinanceBench set,
+the 10-K questions per company
+were counted, and the 5 companies with the highest coverage were selected,
+while keeping sector diversity:
 
-34 benchmark questions total.
+| Company           | 10-K questions | Sector                    |
+|-------------------|----------------|---------------------------|
+| AMD               | 8              | Semiconductors            |
+| Boeing            | 8              | Aerospace / industrial    |
+| American Express  | 7              | Financial services        |
+| PepsiCo           | 6              | Consumer staples          |
+| 3M                | 5              | Industrial conglomerate   |
+
+This gives 34 benchmark questions total.

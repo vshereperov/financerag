@@ -65,6 +65,7 @@ def evaluate(debug=False):
     correctness_by_type = defaultdict(lambda: defaultdict(int))
     correctness_sum = 0.0
     faithfulness_verdicts = defaultdict(int)
+    faithfulness_by_type = defaultdict(lambda: defaultdict(int))
     faithfulness_sum = 0.0
 
     for item in items:
@@ -89,26 +90,50 @@ def evaluate(debug=False):
 
         faithfulness_verdict = faithfulness(context, answer)["verdict"]
         faithfulness_verdicts[faithfulness_verdict] += 1
+        faithfulness_by_type[item["question_type"]][faithfulness_verdict] += 1
         faithfulness_sum += FAITHFULNESS_SCORE.get(faithfulness_verdict, 0.0)
 
         if debug:
-            print(f"[{correctness_verdict:9s}|{faithfulness_verdict:11s}] {item['doc_name']:22s} {item['question'][:45]}")
+            print(f"[{correctness_verdict:9s}|{faithfulness_verdict:11s}] {item['doc_name']:24s} {item['question'][:45]}")
 
     n = len(items)
     latencies.sort()
 
-    print(f"\nRetrieval hit-rate @k={K}: {hits}/{n} = {hits / n:.1%}")
-    print(f"Retrieval latency: median {latencies[n // 2] * 1000:.0f} ms")
-    print(f"\nAnswer correctness: {correctness_sum:.1f}/{n} = {correctness_sum / n:.1%}  {dict(correctness_verdicts)}")
-    print(f"Faithfulness:       {faithfulness_sum:.1f}/{n} = {faithfulness_sum / n:.1%}  {dict(faithfulness_verdicts)}")
-    print("\nCorrectness by type (correct / partial / incorrect):")
-    for question_type in sorted(correctness_by_type):
-        type_verdicts = correctness_by_type[question_type]
-        print(f"  {question_type:20s} {type_verdicts.get('correct', 0)} / {type_verdicts.get('partial', 0)} / {type_verdicts.get('incorrect', 0)}")
-    print("\nHit-rate by type:")
-    for question_type, counts in sorted(hit_by_type.items()):
-        print(f"  {question_type:20s} {counts['hits']}/{counts['total']} = {counts['hits'] / counts['total']:.1%}")
+    def section(title):
+        print(f"\n{'=' * 60}\n {title}\n{'=' * 60}")
 
+    types = sorted(set(hit_by_type) | set(correctness_by_type) | set(faithfulness_by_type))
+
+    def by_type_verdicts(by_type, labels):
+        """Print a per-type breakdown of verdict counts (e.g. correct / partial / incorrect)."""
+        print(f"  by type ({' / '.join(labels)}):")
+        for question_type in types:
+            v = by_type[question_type]
+            counts = " / ".join(str(v.get(label, 0)) for label in labels)
+            print(f"    {question_type:18s} {counts}")
+
+    section("RETRIEVAL")
+    print(f"  Hit-rate @k={K}   {hits}/{n} = {hits / n:.1%}")
+    print(f"  Latency (median)  {latencies[n // 2] * 1000:.0f} ms")
+    print("  by type:")
+    for question_type in types:
+        c = hit_by_type.get(question_type)
+        if c:
+            print(f"    {question_type:18s} {c['hits']}/{c['total']} = {c['hits'] / c['total']:.1%}")
+
+    section("CORRECTNESS")
+    cv = correctness_verdicts
+    print(f"  Overall  {correctness_sum:.1f}/{n} = {correctness_sum / n:.1%}   "
+          f"(correct {cv.get('correct', 0)} / partial {cv.get('partial', 0)} / incorrect {cv.get('incorrect', 0)})")
+    by_type_verdicts(correctness_by_type, ["correct", "partial", "incorrect"])
+
+    section("FAITHFULNESS")
+    fv = faithfulness_verdicts
+    print(f"  Overall  {faithfulness_sum:.1f}/{n} = {faithfulness_sum / n:.1%}   "
+          f"(supported {fv.get('supported', 0)} / partial {fv.get('partial', 0)} / unsupported {fv.get('unsupported', 0)})")
+    by_type_verdicts(faithfulness_by_type, ["supported", "partial", "unsupported"])
+
+    section("TOKEN USAGE / APPROX COST")
     usage.report()
 
 

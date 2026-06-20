@@ -26,7 +26,6 @@ def reset():
 
 def report():
     """Print a report of token usage and estimated costs for all recorded models."""
-    print("\nToken usage / approx cost:")
     total = 0.0
     for model, stats in _usage.items():
         line = (

@@ -49,7 +49,7 @@ def retrieve(query, k):
     """Retrieve the top k pages for a query, dispatching on RETRIEVAL_MODE.
 
     When RERANK is enabled, retrieve a wider candidate pool and re-score it
-    down to k with a cross-encoder.
+    down to k with the hosted rerank API.
     """
     fetch_k = CANDIDATES if settings.rerank else k
     if settings.retrieval_mode == "dense":

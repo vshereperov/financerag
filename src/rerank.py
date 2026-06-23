@@ -1,21 +1,36 @@
-from fastembed.rerank.cross_encoder import TextCrossEncoder
+from types import SimpleNamespace
+
+import httpx
+from openai import OpenAI
+
 from .config import settings
+from . import usage
 
-# Lazy initialization
-_reranker = None
-
-
-def _model():
-    global _reranker
-    if _reranker is None:
-        _reranker = TextCrossEncoder(model_name=settings.rerank_model)
-    return _reranker
+client = OpenAI(base_url="https://openrouter.ai/api/v1", api_key=settings.openrouter_api_key)
 
 
 def rerank(query, points, k):
-    """Rerank retrieved points with a cross-encoder over pairs and return the top k by reranker score."""
+    """Rerank retrieved points via the OpenRouter rerank API and return the top k."""
     if not points:
         return points
-    scores = _model().rerank(query, [p.payload["content"] for p in points])
-    ranked = sorted(zip(scores, points), key=lambda sp: sp[0], reverse=True)
-    return [point for _, point in ranked[:k]]
+    documents = [p.payload["content"] for p in points]
+    response = client.post(
+        "/rerank",
+        body={
+            "query": query,
+            "documents": documents,
+            "model": settings.rerank_model,
+            "top_n": k,
+        },
+        cast_to=httpx.Response,
+    )
+    body = response.json()
+    billed = body.get("usage") or {}
+    usage.record(
+        settings.rerank_model,
+        SimpleNamespace(
+            prompt_tokens=billed.get("total_tokens") or 0,
+            cost=billed.get("cost") or 0.0,
+        ),
+    )
+    return [points[r["index"]] for r in body["results"]]

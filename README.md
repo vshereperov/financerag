@@ -57,26 +57,26 @@ The system is evaluated against FinanceBench with a reproducible harness
 
 ## Results
 
-The final system reaches **66.2% answer correctness**.
+The final system reaches **76.5% answer correctness**.
 
 Each change below was A/B-tested against the previous best configuration on the
 same question set.
 
 ### Summary
 
-The final configuration lifts answer correctness from **39.7% → 66.2%**
-(a **+26.5 pt** gain) over the baseline:
+The final configuration lifts answer correctness from **39.7% → 76.5%**
+(a **+36.8 pt** gain) over the baseline:
 
 | Metric        | Baseline | Final | Δ          |
 |---------------|---------:|------:|:----------:|
-| Hit-rate@k    |  29.4%   | 61.8% | **+32.4**  |
-| Correctness   |  39.7%   | 66.2% | **+26.5**  |
-| Faithfulness  |  89.7%   | 86.8% | −2.9       |
+| Hit-rate@k    |  29.4%   | 82.4% | **+53.0**  |
+| Correctness   |  39.7%   | 76.5% | **+36.8**  |
+| Faithfulness  |  89.7%   | 94.1% | **+4.4**   |
 
 > **Baseline config:** dense retrieval · `text-embedding-3-small` · k=5
 >
 > **Final config:** page-level retrieval + summaries · hybrid retrieval ·
-> reranker · `text-embedding-3-large` · k=10
+> hosted reranker (`cohere/rerank-4-fast`) · `text-embedding-3-large` · k=10
 
 ### Per-change breakdown
 
@@ -87,7 +87,8 @@ The final configuration lifts answer correctness from **39.7% → 66.2%**
 | 3  | + Hybrid retrieval                     |     52.9%  |      51.5%  |       89.7%  |
 | 4  | + k=10                                 |     55.9%  |      55.9%  |       86.8%  |
 | 5  | + `text-embedding-3-large`             |     61.8%  |      58.8%  |       86.8%  |
-| 6  | **+ Page-level retrieval + summaries** | **61.8%**  |  **66.2%**  |       86.8%  |
+| 6  | + Page-level retrieval + summaries     |     61.8%  |      66.2%  |       86.8%  |
+| 7  | **+ Hosted reranker (`cohere/rerank-4-fast`)** | **82.4%** | **76.5%** | **94.1%** |
 
 Each row is cumulative: it adds one change on top of the row above.
 

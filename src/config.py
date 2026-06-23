@@ -26,7 +26,7 @@ class Settings(BaseSettings):
     # Retrieval
     retrieval_mode: Literal["dense", "hybrid"] = "hybrid"
     rerank: bool = True
-    rerank_model: str = "jinaai/jina-reranker-v2-base-multilingual"
+    rerank_model: str = "cohere/rerank-4-fast"
     top_k: int = 10
 
 

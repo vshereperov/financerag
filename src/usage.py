@@ -2,7 +2,7 @@ from collections import defaultdict
 
 # Prices per 1M tokens: (input, output)
 PRICES = {
-    "openai/text-embedding-3-small": (0.02, 0.0),
+    "openai/text-embedding-3-large": (0.13, 0.0),
     "openai/gpt-4o-mini": (0.15, 0.60),
     "openai/gpt-4o": (2.50, 10.0),
 }

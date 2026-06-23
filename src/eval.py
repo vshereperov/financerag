@@ -10,7 +10,6 @@ from .generate import generate_answer, build_context
 from .judge import correctness, faithfulness
 from . import usage
 
-K = 5  # Number of retrieved chunks passed to the LLM
 GOLD_PAGE_OFFSET = 1  # FinanceBench pages are 0-indexed, but ingested pages are 1-indexed
 CORRECTNESS_SCORE = {"correct": 1.0, "partial": 0.5, "incorrect": 0.0}
 FAITHFULNESS_SCORE = {"supported": 1.0, "partial": 0.5, "unsupported": 0.0}
@@ -70,7 +69,7 @@ def evaluate(debug=False):
 
     for item in items:
         t0 = time.perf_counter()
-        points = retrieve(item["question"], k=K)
+        points = retrieve(item["question"], k=settings.top_k)
         latencies.append(time.perf_counter() - t0)
 
         hit = is_hit(item, points)
@@ -113,7 +112,7 @@ def evaluate(debug=False):
             print(f"    {question_type:18s} {counts}")
 
     section("RETRIEVAL")
-    print(f"  Hit-rate @k={K}   {hits}/{n} = {hits / n:.1%}")
+    print(f"  Hit-rate @k={settings.top_k}   {hits}/{n} = {hits / n:.1%}")
     print(f"  Latency (median)  {latencies[n // 2] * 1000:.0f} ms")
     print("  by type:")
     for question_type in types:

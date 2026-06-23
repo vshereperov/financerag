@@ -11,8 +11,8 @@ class Settings(BaseSettings):
     financebench_dir: str
 
     # Embeddings
-    embedding_model: str = "openai/text-embedding-3-small"
-    embedding_dim: int = 1536
+    embedding_model: str = "openai/text-embedding-3-large"
+    embedding_dim: int = 3072
     sparse_model: str = "Qdrant/bm25"
 
     # Vector store
@@ -25,8 +25,9 @@ class Settings(BaseSettings):
 
     # Retrieval
     retrieval_mode: Literal["dense", "hybrid"] = "hybrid"
-    rerank: bool = False
+    rerank: bool = True
     rerank_model: str = "jinaai/jina-reranker-v2-base-multilingual"
+    top_k: int = 10
 
 
 settings = Settings()  # type: ignore[call-arg]  # values come from the environment

@@ -57,26 +57,39 @@ The system is evaluated against FinanceBench with a reproducible harness
 
 ## Results
 
-Measured on 34 FinanceBench questions over 9 SEC 10-K filings. Each retrieval
-change was A/B-tested.
+The final system reaches **66.2% answer correctness**.
 
-| Config                  | hit-rate@5 | correctness | faithfulness |
-|-------------------------|-----------:|------------:|-------------:|
-| dense (baseline)        | 29.4%      | 39.7%       | 89.7%        |
-| hybrid (dense + BM25)   | 26.5%      | 30.9%       | 98.5%        |
-| dense + reranker        | 50.0%      | 44.1%       | 95.6%        |
-| **hybrid + reranker**   | **52.9%**  | **51.5%**   | 89.7%        |
+Each change below was A/B-tested against the previous best configuration on the
+same question set.
 
-Notes:
+### Summary
 
-- **Reranker model choice was decisive.** A 512-token cross-encoder
-  (ms-marco-MiniLM) made retrieval *worse* than baseline by truncating long
-  table chunks; a 1024-token model (jina-reranker-v2) nearly doubled hit-rate.
-  This points to chunk length as the next bottleneck.
-- **Best config is hybrid + reranker:** the reranker rescues
-  hybrid's good recall from its poor ranking.
-- Reranking trades latency for quality (~12 s/query on CPU); production would
-  move the reranker to GPU or a hosted rerank API.
+The final configuration lifts answer correctness from **39.7% → 66.2%**
+(a **+26.5 pt** gain) over the baseline:
+
+| Metric        | Baseline | Final | Δ          |
+|---------------|---------:|------:|:----------:|
+| Hit-rate@k    |  29.4%   | 61.8% | **+32.4**  |
+| Correctness   |  39.7%   | 66.2% | **+26.5**  |
+| Faithfulness  |  89.7%   | 86.8% | −2.9       |
+
+> **Baseline config:** dense retrieval · `text-embedding-3-small` · k=5
+>
+> **Final config:** page-level retrieval + summaries · hybrid retrieval ·
+> reranker · `text-embedding-3-large` · k=10
+
+### Per-change breakdown
+
+| #  | Configuration                          | Hit-rate@k | Correctness | Faithfulness |
+|----|----------------------------------------|-----------:|------------:|-------------:|
+| 1  | Dense, k=5 _(baseline)_                |     29.4%  |      39.7%  |       89.7%  |
+| 2  | + Reranker                             |     50.0%  |      44.1%  |       95.6%  |
+| 3  | + Hybrid retrieval                     |     52.9%  |      51.5%  |       89.7%  |
+| 4  | + k=10                                 |     55.9%  |      55.9%  |       86.8%  |
+| 5  | + `text-embedding-3-large`             |     61.8%  |      58.8%  |       86.8%  |
+| 6  | **+ Page-level retrieval + summaries** | **61.8%**  |  **66.2%**  |       86.8%  |
+
+Each row is cumulative: it adds one change on top of the row above.
 
 ---
 

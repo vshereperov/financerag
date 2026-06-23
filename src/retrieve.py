@@ -4,11 +4,8 @@ from .store import client, DENSE, SPARSE
 from .rerank import rerank
 from .config import settings
 
-# Number of candidates to retrieve from each index for hybrid retrieval
+# Candidate pool: per-index limit for hybrid retrieval, and the rerank pool size
 CANDIDATES = 30
-
-# Size of the candidate pool fed to the reranker when RERANK is enabled
-RERANK_CANDIDATES = 30
 
 
 def _retrieve_dense(query, k):
@@ -48,13 +45,13 @@ def _retrieve_hybrid(query, k):
     return response.points
 
 
-def retrieve(query, k=5):
-    """Retrieve the top k chunks for a query, dispatching on RETRIEVAL_MODE.
+def retrieve(query, k):
+    """Retrieve the top k pages for a query, dispatching on RETRIEVAL_MODE.
 
     When RERANK is enabled, retrieve a wider candidate pool and re-score it
     down to k with a cross-encoder.
     """
-    fetch_k = RERANK_CANDIDATES if settings.rerank else k
+    fetch_k = CANDIDATES if settings.rerank else k
     if settings.retrieval_mode == "dense":
         points = _retrieve_dense(query, fetch_k)
     else:

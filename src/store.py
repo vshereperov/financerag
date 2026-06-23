@@ -10,8 +10,9 @@ from .config import settings
 
 client = QdrantClient(url=settings.qdrant_url)
 
-# Named vector identifiers used across ingest and retrieval
-DENSE = "dense"
+# Named vectors. The dense vector holds the embedding of each page's LLM
+# summary; the sparse vector is BM25 over the full page text.
+DENSE = "summary"
 SPARSE = "sparse"
 
 
@@ -30,8 +31,8 @@ def init_collection():
     )
 
 
-def upsert_chunks(chunks, dense_vectors, sparse_vectors, start_id):
-    """Upsert chunks with their dense and sparse vectors into the Qdrant collection."""
+def upsert_pages(pages, dense_vectors, sparse_vectors, start_id):
+    """Upsert page records with their dense and sparse vectors into the Qdrant collection."""
     points = [
         PointStruct(
             id=start_id + i,
@@ -43,14 +44,15 @@ def upsert_chunks(chunks, dense_vectors, sparse_vectors, start_id):
                 ),
             },
             payload={
-                "company": c["company"],
-                "doc_name": c["doc_name"],
-                "page": c["page"],
-                "content": c["content"],
+                "company": p["company"],
+                "doc_name": p["doc_name"],
+                "page": p["page"],
+                "content": p["content"],
+                "summary": p["summary"],
             },
         )
-        for i, (c, dense, sparse) in enumerate(
-            zip(chunks, dense_vectors, sparse_vectors)
+        for i, (p, dense, sparse) in enumerate(
+            zip(pages, dense_vectors, sparse_vectors)
         )
     ]
     client.upsert(collection_name=settings.qdrant_collection, points=points)

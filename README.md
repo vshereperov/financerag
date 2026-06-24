@@ -57,21 +57,21 @@ The system is evaluated against FinanceBench with a reproducible harness
 
 ## Results
 
-The final system reaches **76.5% answer correctness**.
+The final system reaches **72.1% answer correctness**.
 
 Each change below was A/B-tested against the previous best configuration on the
 same question set.
 
 ### Summary
 
-The final configuration lifts answer correctness from **39.7% → 76.5%**
-(a **+36.8 pt** gain) over the baseline:
+The final configuration lifts answer correctness from **39.7% → 72.1%**
+(a **+32.4 pt** gain) over the baseline:
 
 | Metric        | Baseline | Final | Δ          |
 |---------------|---------:|------:|:----------:|
-| Hit-rate@k    |  29.4%   | 82.4% | **+53.0**  |
-| Correctness   |  39.7%   | 76.5% | **+36.8**  |
-| Faithfulness  |  89.7%   | 94.1% | **+4.4**   |
+| Hit-rate@k    |  29.4%   | 79.4% | **+50.0**  |
+| Correctness   |  39.7%   | 72.1% | **+32.4**  |
+| Faithfulness  |  88.2%   | 94.1% | **+5.9**   |
 
 > **Baseline config:** dense retrieval · `text-embedding-3-small` · k=5
 >
@@ -82,13 +82,13 @@ The final configuration lifts answer correctness from **39.7% → 76.5%**
 
 | #  | Configuration                          | Hit-rate@k | Correctness | Faithfulness |
 |----|----------------------------------------|-----------:|------------:|-------------:|
-| 1  | Dense, k=5 _(baseline)_                |     29.4%  |      39.7%  |       89.7%  |
-| 2  | + Reranker                             |     50.0%  |      44.1%  |       95.6%  |
-| 3  | + Hybrid retrieval                     |     52.9%  |      51.5%  |       89.7%  |
-| 4  | + k=10                                 |     55.9%  |      55.9%  |       86.8%  |
-| 5  | + `text-embedding-3-large`             |     61.8%  |      58.8%  |       86.8%  |
-| 6  | + Page-level retrieval + summaries     |     61.8%  |      66.2%  |       86.8%  |
-| 7  | **+ Hosted reranker (`cohere/rerank-4-fast`)** | **82.4%** | **76.5%** | **94.1%** |
+| 1  | Dense, k=5 _(baseline)_                |     29.4%  |      39.7%  |       88.2%  |
+| 2  | + Reranker (jina, local)               |     50.0%  |      44.1%  |       92.6%  |
+| 3  | + Hybrid retrieval                     |     52.9%  |      48.5%  |       95.6%  |
+| 4  | + k=10                                 |     55.9%  |      50.0%  |       85.3%  |
+| 5  | + `text-embedding-3-large`             |     61.8%  |      58.8%  |       79.4%  |
+| 6  | + Page-level retrieval + summaries     |     64.7%  |      57.4%  |       80.9%  |
+| 7  | **+ Hosted reranker (`cohere/rerank-4-fast`)** | **79.4%** | **72.1%** | **94.1%** |
 
 Each row is cumulative: it adds one change on top of the row above.
 

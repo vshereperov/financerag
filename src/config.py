@@ -21,7 +21,7 @@ class Settings(BaseSettings):
 
     # Generation & evaluation
     llm_model: str = "openai/gpt-4o-mini"
-    judge_model: str = "openai/gpt-4o"
+    judge_model: str = "openai/gpt-5.1"
 
     # Retrieval
     retrieval_mode: Literal["dense", "hybrid"] = "hybrid"

@@ -56,7 +56,7 @@ Metrics:
 
 ## Results
 
-The system currently reaches **63.0% answer correctness** on the
+The system currently reaches **69.0% answer correctness** on the
 150-question FinanceBench benchmark.
 
 > **Current pipeline:** page-level retrieval + query-aligned page summaries
@@ -78,3 +78,4 @@ The system currently reaches **63.0% answer correctness** on the
 | 8  | + Query-aligned page summaries (doc2query) |     91.2%  |      70.6%  |       91.2%  |
 |    | **Phase 2 — evaluated on 150 questions**   |            |             |              |
 | 8  | + Query-aligned page summaries (doc2query) |     84.7%  |      63.0%  |       88.0%  |
+| 9  | + Generation prompt rewrite                |     84.7%  |      69.0%  |       84.0%  |

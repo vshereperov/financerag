@@ -1,6 +1,6 @@
 # FinanceRAG
 
-A retrieval-augmented generation (RAG) system for querying SEC 10-K filings, evaluated against the [FinanceBench](https://github.com/patronus-ai/financebench) benchmark.
+A retrieval-augmented generation (RAG) system for querying corporate financial filings (10-K, 10-Q, earnings releases), evaluated against the [FinanceBench](https://github.com/patronus-ai/financebench) benchmark.
 
 ---
 
@@ -45,8 +45,7 @@ python -m src.eval --debug  # show per-question verdicts
 
 ## Evaluation
 
-The system is evaluated against FinanceBench with a reproducible harness
-(deterministic, `temperature=0`):
+Metrics:
 
 - **Retrieval hit-rate** — did the gold evidence page land in top-k
 - **Answer correctness** — LLM-as-judge vs gold answers (judge model is
@@ -57,59 +56,25 @@ The system is evaluated against FinanceBench with a reproducible harness
 
 ## Results
 
-The final system reaches **72.1% answer correctness**.
+The system currently reaches **63.0% answer correctness** on the
+150-question FinanceBench benchmark.
 
-Each change below was A/B-tested against the previous best configuration on the
-same question set.
+> **Current pipeline:** page-level retrieval + query-aligned page summaries
+> (doc2query) · hybrid retrieval · hosted reranker (`cohere/rerank-4-fast`) ·
+> `text-embedding-3-large` · k=10
 
-### Summary
+### Development
 
-The final configuration lifts answer correctness from **39.7% → 72.1%**
-(a **+32.4 pt** gain) over the baseline:
-
-| Metric        | Baseline | Final | Δ          |
-|---------------|---------:|------:|:----------:|
-| Hit-rate@k    |  29.4%   | 79.4% | **+50.0**  |
-| Correctness   |  39.7%   | 72.1% | **+32.4**  |
-| Faithfulness  |  88.2%   | 94.1% | **+5.9**   |
-
-> **Baseline config:** dense retrieval · `text-embedding-3-small` · k=5
->
-> **Final config:** page-level retrieval + summaries · hybrid retrieval ·
-> hosted reranker (`cohere/rerank-4-fast`) · `text-embedding-3-large` · k=10
-
-### Per-change breakdown
-
-| #  | Configuration                          | Hit-rate@k | Correctness | Faithfulness |
-|----|----------------------------------------|-----------:|------------:|-------------:|
-| 1  | Dense, k=5 _(baseline)_                |     29.4%  |      39.7%  |       88.2%  |
-| 2  | + Reranker (jina, local)               |     50.0%  |      44.1%  |       92.6%  |
-| 3  | + Hybrid retrieval                     |     52.9%  |      48.5%  |       95.6%  |
-| 4  | + k=10                                 |     55.9%  |      50.0%  |       85.3%  |
-| 5  | + `text-embedding-3-large`             |     61.8%  |      58.8%  |       79.4%  |
-| 6  | + Page-level retrieval + summaries     |     64.7%  |      57.4%  |       80.9%  |
-| 7  | **+ Hosted reranker (`cohere/rerank-4-fast`)** | **79.4%** | **72.1%** | **94.1%** |
-
-Each row is cumulative: it adds one change on top of the row above.
-
----
-
-## Corpus
-
-The corpus is built from SEC 10-K filings of 5 companies, evaluated against
-the open-source FinanceBench benchmark.
-
-Companies were not chosen at random. From the 150-question open FinanceBench set,
-the 10-K questions per company
-were counted, and the 5 companies with the highest coverage were selected,
-while keeping sector diversity:
-
-| Company           | 10-K questions | Sector                    |
-|-------------------|----------------|---------------------------|
-| AMD               | 8              | Semiconductors            |
-| Boeing            | 8              | Aerospace / industrial    |
-| American Express  | 7              | Financial services        |
-| PepsiCo           | 6              | Consumer staples          |
-| 3M                | 5              | Industrial conglomerate   |
-
-This gives 34 benchmark questions total.
+| #  | Configuration                              | Hit-rate@k | Correctness | Faithfulness |
+|----|--------------------------------------------|-----------:|------------:|-------------:|
+|    | **Phase 1 — evaluated on 34 questions**    |            |             |              |
+| 1  | Dense, k=5 _(baseline)_                    |     29.4%  |      39.7%  |       88.2%  |
+| 2  | + Reranker (jina, local)                   |     50.0%  |      44.1%  |       92.6%  |
+| 3  | + Hybrid retrieval                         |     52.9%  |      48.5%  |       95.6%  |
+| 4  | + k=10                                     |     55.9%  |      50.0%  |       85.3%  |
+| 5  | + `text-embedding-3-large`                 |     61.8%  |      58.8%  |       79.4%  |
+| 6  | + Page-level retrieval + summaries         |     64.7%  |      57.4%  |       80.9%  |
+| 7  | + Hosted reranker (`cohere/rerank-4-fast`) |     79.4%  |      72.1%  |       94.1%  |
+| 8  | + Query-aligned page summaries (doc2query) |     91.2%  |      70.6%  |       91.2%  |
+|    | **Phase 2 — evaluated on 150 questions**   |            |             |              |
+| 8  | + Query-aligned page summaries (doc2query) |     84.7%  |      63.0%  |       88.0%  |

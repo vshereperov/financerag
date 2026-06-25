@@ -7,7 +7,6 @@ from pathlib import Path
 from collections import defaultdict
 
 from .config import settings
-from .ingest import DOCS
 from .retrieve import retrieve
 from .generate import generate_answer, build_context
 from .judge import correctness, faithfulness
@@ -17,20 +16,17 @@ GOLD_PAGE_OFFSET = 1  # FinanceBench pages start at 0, ours at 1
 CORRECTNESS_SCORE = {"correct": 1.0, "partial": 0.5, "incorrect": 0.0}
 FAITHFULNESS_SCORE = {"supported": 1.0, "partial": 0.5, "unsupported": 0.0}
 
-INGESTED_DOCS = {doc_name for _, doc_name in DOCS}
 JSONL = Path(settings.financebench_dir) / "data" / "financebench_open_source.jsonl"
 
 
 def load_eval_set():
-    """Load and filter FinanceBench questions to only those covered by ingested documents."""
+    """Load FinanceBench questions from the benchmark."""
     items = []
     with open(JSONL, encoding="utf-8") as f:
         for line in f:
             if not line.strip():
                 continue
             record = json.loads(line)
-            if record["doc_name"] not in INGESTED_DOCS:
-                continue
             items.append(
                 {
                     "id": record["financebench_id"],
@@ -83,7 +79,7 @@ def evaluate(debug=False, base="evals/results"):
     faithfulness_verdicts = defaultdict(int)
     faithfulness_by_type = defaultdict(lambda: defaultdict(int))
     faithfulness_sum = 0.0
-    results = []  # per-question records for the JSON artifact
+    results = []
 
     capture = io.StringIO()
     with contextlib.redirect_stdout(capture):

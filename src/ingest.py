@@ -61,7 +61,7 @@ def _summarize(page):
         f"PAGE:\n{text}"
     )
     response = llm.chat.completions.create(
-        model=settings.llm_model,
+        model=settings.summary_model,
         messages=[
             {"role": "system", "content": SUMMARY_SYSTEM_PROMPT},
             {"role": "user", "content": context},
@@ -123,7 +123,7 @@ def parse_all():
         pages = parse_pages(company, doc_name)
         print(f"{doc_name}: {len(pages)} pages")
         all_pages.extend(pages)
-    print(f"TOTAL: {len(all_pages)} pages -> summarizing with {settings.llm_model}")
+    print(f"TOTAL: {len(all_pages)} pages -> summarizing with {settings.summary_model}")
     summarize_pages(all_pages)
     return all_pages
 

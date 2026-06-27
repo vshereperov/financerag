@@ -56,12 +56,12 @@ def generate_answer(question, points):
     """Generate an answer to the question using the retrieved points as context."""
     context = build_context(points)
     response = client.chat.completions.create(
-        model=settings.llm_model,
+        model=settings.generator_model,
         messages=[
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": f"Context:\n{context}\n\nQuestion: {question}"},
         ],
         temperature=0.0,
     )
-    usage.record(settings.llm_model, response.usage)
+    usage.record(settings.generator_model, response.usage)
     return response.choices[0].message.content

@@ -4,9 +4,6 @@ from .store import client, DENSE, SPARSE
 from .rerank import rerank
 from .config import settings
 
-# Candidate pool: per-index limit for hybrid retrieval, and the rerank pool size
-CANDIDATES = 30
-
 
 def _retrieve_dense(query, k):
     """Dense retrieval: retrieve the top k candidates from the dense vector index."""
@@ -28,14 +25,14 @@ def _retrieve_hybrid(query, k):
     response = client.query_points(
         collection_name=settings.qdrant_collection,
         prefetch=[
-            Prefetch(query=dense_vec, using=DENSE, limit=CANDIDATES),
+            Prefetch(query=dense_vec, using=DENSE, limit=settings.candidates),
             Prefetch(
                 query=SparseVector(
                     indices=sparse_vec.indices.tolist(),
                     values=sparse_vec.values.tolist(),
                 ),
                 using=SPARSE,
-                limit=CANDIDATES,
+                limit=settings.candidates,
             ),
         ],
         query=FusionQuery(fusion=Fusion.RRF),
@@ -51,7 +48,7 @@ def retrieve(query, k):
     When RERANK is enabled, retrieve a wider candidate pool and re-score it
     down to k with the hosted rerank API.
     """
-    fetch_k = CANDIDATES if settings.rerank else k
+    fetch_k = settings.candidates if settings.rerank else k
     if settings.retrieval_mode == "dense":
         points = _retrieve_dense(query, fetch_k)
     else:

@@ -13,7 +13,7 @@ class Settings(BaseSettings):
     qdrant_collection: str = "financerag"
 
     # Embedding
-    summary_model: str = "openai/gpt-4o-mini"
+    summary_model: str = "deepseek/deepseek-v4-flash"
     embedding_model: str = "openai/text-embedding-3-large"
     embedding_dim: int = 3072
     sparse_model: str = "Qdrant/bm25"

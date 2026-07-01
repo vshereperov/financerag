@@ -14,6 +14,7 @@ class Settings(BaseSettings):
 
     # Embedding
     summary_model: str = "deepseek/deepseek-v4-flash"
+    summary_reasoning_effort: Literal["none", "minimal", "low", "medium", "high", "xhigh"] = "none"
     embedding_model: str = "openai/text-embedding-3-large"
     embedding_dim: int = 3072
     sparse_model: str = "Qdrant/bm25"
@@ -26,7 +27,8 @@ class Settings(BaseSettings):
     top_k: int = 10
 
     # Generation
-    generator_model: str = "openai/gpt-4o-mini"
+    generator_model: str = "deepseek/deepseek-v4-flash"
+    generator_reasoning_effort: Literal["none", "minimal", "low", "medium", "high", "xhigh"] = "high"
 
     # Evaluation
     judge_model: str = "openai/gpt-5.1"

@@ -68,7 +68,7 @@ def _summarize(page):
         ],
         temperature=0.0,
         max_tokens=256,
-        extra_body={"reasoning": {"enabled": False}},
+        reasoning_effort=settings.summary_reasoning_effort,
     )
     return (response.choices[0].message.content or "").strip()
 

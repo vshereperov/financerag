@@ -62,6 +62,7 @@ def generate_answer(question, points):
             {"role": "user", "content": f"Context:\n{context}\n\nQuestion: {question}"},
         ],
         temperature=0.0,
+        reasoning_effort=settings.generator_reasoning_effort,
     )
     usage.record(settings.generator_model, response.usage)
     return response.choices[0].message.content

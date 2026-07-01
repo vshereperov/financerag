@@ -56,12 +56,13 @@ Metrics:
 
 ## Results
 
-The system currently reaches **69.3% answer correctness** on the
+The system currently reaches **82.7% answer correctness** on the
 150-question FinanceBench benchmark.
 
 > **Current pipeline:** page-level retrieval + query-aligned page summaries
 > (doc2query, `deepseek-v4-flash`) · hybrid retrieval · hosted reranker
-> (`cohere/rerank-4-fast`) · `text-embedding-3-large` · k=10
+> (`cohere/rerank-4-fast`) · `text-embedding-3-large` · k=10 · generator
+> `deepseek-v4-flash` (reasoning)
 
 ### Development
 
@@ -79,4 +80,5 @@ The system currently reaches **69.3% answer correctness** on the
 |    | **Phase 2 — evaluated on 150 questions**   |            |             |              |
 | 8  | + Query-aligned page summaries (doc2query) |     84.7%  |      63.0%  |       88.0%  |
 | 9  | + Generation prompt rewrite                |     84.7%  |      69.0%  |       84.0%  |
-| 10 | + `deepseek-v4-flash` page summaries        |     86.7%  |      69.3%  |       84.0%  |
+| 10 | + `deepseek-v4-flash` page summaries       |     86.7%  |      69.3%  |       84.0%  |
+| 11 | + `deepseek-v4-flash` generator            |     86.7%  |      82.7%  |       92.0%  |

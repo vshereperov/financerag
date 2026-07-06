@@ -86,7 +86,6 @@ def evaluate(debug=False, base="evals/results"):
         for item in items:
             t0 = time.perf_counter()
             points = retrieve(item["question"], k=settings.top_k)
-            latencies.append(time.perf_counter() - t0)
 
             hit = is_hit(item, points)
             hits += hit
@@ -95,6 +94,7 @@ def evaluate(debug=False, base="evals/results"):
 
             context = build_context(points)
             answer = generate_answer(item["question"], points)
+            latencies.append(time.perf_counter() - t0)
 
             correctness_result = correctness(
                 item["question"], item["gold_answer"], answer

@@ -11,14 +11,6 @@ def main():
     answer = generate_answer(question, points)
     print("\nAnswer:")
     print(answer)
-    print("\nSources:")
-    for point in points:
-        payload = point.payload
-        if payload is None:
-            continue
-        print(
-            f"  {payload['company']} | {payload['doc_name']} | page {payload['page']} | score {point.score:.3f}"
-        )
 
 
 if __name__ == "__main__":

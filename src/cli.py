@@ -1,7 +1,8 @@
 import sys
+
 from .config import settings
-from .retrieve import retrieve
 from .generate import generate_answer
+from .retrieve import retrieve
 
 
 def main():

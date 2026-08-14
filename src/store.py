@@ -1,11 +1,12 @@
 from qdrant_client import QdrantClient
 from qdrant_client.models import (
     Distance,
-    VectorParams,
-    SparseVectorParams,
-    SparseVector,
     PointStruct,
+    SparseVector,
+    SparseVectorParams,
+    VectorParams,
 )
+
 from .config import settings
 
 client = QdrantClient(url=settings.qdrant_url)

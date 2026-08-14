@@ -1,14 +1,13 @@
 import json
-from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor
+from pathlib import Path
 
 import fitz
 from openai import OpenAI
 
 from .config import settings
-from .embed import embed_texts, embed_sparse_docs
-from .store import init_collection, upsert_pages, client
-
+from .embed import embed_sparse_docs, embed_texts
+from .store import client, init_collection, upsert_pages
 
 MIN_CHARS = 40  # Skip pages with fewer chars than this when summarizing
 BATCH = 100  # Embed and write this many pages to Qdrant at a time

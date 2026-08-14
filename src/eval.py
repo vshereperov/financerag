@@ -1,16 +1,16 @@
-import io
-import sys
-import json
-import time
 import contextlib
-from pathlib import Path
+import io
+import json
+import sys
+import time
 from collections import defaultdict
+from pathlib import Path
 
-from .config import settings
-from .retrieve import retrieve
-from .generate import generate_answer, build_context
-from .judge import correctness, faithfulness
 from . import usage
+from .config import settings
+from .generate import build_context, generate_answer
+from .judge import correctness, faithfulness
+from .retrieve import retrieve
 
 GOLD_PAGE_OFFSET = 1  # FinanceBench pages start at 0, ours at 1
 CORRECTNESS_SCORE = {"correct": 1.0, "partial": 0.5, "incorrect": 0.0}

@@ -1,7 +1,9 @@
 import json
+
 from openai import OpenAI
-from .config import settings
+
 from . import usage
+from .config import settings
 
 client = OpenAI(base_url="https://openrouter.ai/api/v1", api_key=settings.openrouter_api_key)
 

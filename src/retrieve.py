@@ -1,8 +1,9 @@
-from qdrant_client.models import Prefetch, SparseVector, FusionQuery, Fusion
-from .embed import embed_texts, embed_sparse_query
-from .store import client, DENSE, SPARSE
-from .rerank import rerank
+from qdrant_client.models import Fusion, FusionQuery, Prefetch, SparseVector
+
 from .config import settings
+from .embed import embed_sparse_query, embed_texts
+from .rerank import rerank
+from .store import DENSE, SPARSE, client
 
 
 def _retrieve_dense(query, k):

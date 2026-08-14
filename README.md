@@ -22,7 +22,7 @@ python -m venv .venv
 .venv\Scripts\activate
 
 # 3. Install dependencies
-pip install -r requirements.txt
+pip install -e .
 
 # 4. Create the config file, then fill in your values
 copy .env.example .env
@@ -61,6 +61,15 @@ the Middle East and Africa), APAC (Asia Pacific, Australia and New Zealand), and
 python -m src.eval
 python -m src.eval --debug  # show per-question verdicts
 ```
+
+## Tests
+
+```bash
+pip install -e . --group dev
+pytest
+```
+
+[GitHub Actions](.github/workflows/ci.yml) runs them on every pull request and on pushes to `main`.
 
 ## Pipeline
 

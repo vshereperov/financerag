@@ -1,6 +1,0 @@
-fastembed==0.8.0
-httpx==0.28.1
-openai==2.41.1
-PyMuPDF==1.27.2.3
-pydantic-settings==2.14.2
-qdrant-client==1.18.0
